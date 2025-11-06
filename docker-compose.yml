@@ -3,9 +3,9 @@ services:
   decidim:
     image: decidim/decidim:latest
     # Command runs database setup then starts the server
+    # Skip seeding in production to avoid errors - seed manually if needed
     command: >
       sh -c "bundle exec rake db:prepare && 
-             bundle exec rake db:seed && 
              bundle exec rails s -b 0.0.0.0"
     ports:
       - "3000:3000"
