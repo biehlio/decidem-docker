@@ -1,35 +1,38 @@
-version: '3'
+version: "3"
 services:
   decidim:
     image: decidim/decidim:latest
     entrypoint: ["/code/vendor/hello-world.sh"]
-    # The entrypoint override above wipes out the CMD 
-    # on the Dockerfile-deploy, so we need to declare it 
+    # The entrypoint override above wipes out the CMD
+    # on the Dockerfile-deploy, so we need to declare it
     # again here (https://github.com/docker/compose/issues/3140)
     command: ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
-    ports:
-      - 3000:3000
+    # Port mapping removed for Coolify domain-based routing
+    # Coolify will handle routing via Traefik proxy
+    # If you need direct port access, use: ports: ["127.0.0.1:3000:3000"]
     volumes:
       # Makes our entrypoint scripts available to the container
       # under /code/vendor
       - ./scripts:/code/vendor
     environment:
-      - RAILS_ENV=development
+      - RAILS_ENV=${RAILS_ENV:-production}
       - DATABASE_HOST=pg
       - DATABASE_USERNAME=postgres
-    links:
-      - pg
-      - redis
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:?}
   pg:
-    image: postgres
+    image: postgres:latest
     volumes:
       - pg-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:?}
+      - POSTGRES_DB=${POSTGRES_DB:-decidim_production}
   redis:
-    image: redis
+    image: redis:latest
     volumes:
       - redis-data:/data
+    command: redis-server --appendonly yes
 volumes:
   pg-data: {}
   redis-data: {}
