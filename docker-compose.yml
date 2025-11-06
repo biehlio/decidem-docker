@@ -19,7 +19,9 @@ services:
   pg:
     image: postgres:latest
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      # Updated for PostgreSQL 18+ compatibility
+      # Uses /var/lib/postgresql instead of /var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:?}
