@@ -10,11 +10,34 @@ services:
     ports:
       - "3000:3000"
     environment:
+      # Required base configuration
       - RAILS_ENV=${RAILS_ENV:-production}
+      - SECRET_KEY_BASE=${SERVICE_PASSWORD_SECRET_64}
+
+      # Database configuration
       - DATABASE_HOST=pg
       - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
-      - SECRET_KEY_BASE=${SECRET_KEY_BASE:?}
+      - DATABASE_PASSWORD=${SERVICE_PASSWORD_DB}
+
+      # Required SMTP configuration for emails
+      - SMTP_ADDRESS=${SMTP_ADDRESS:?}
+      - SMTP_DOMAIN=${SMTP_DOMAIN:?}
+      - SMTP_USERNAME=${SMTP_USERNAME:?}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:?}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_STARTTLS_AUTO=${SMTP_STARTTLS_AUTO:-true}
+      - SMTP_AUTHENTICATION=${SMTP_AUTHENTICATION:-plain}
+
+      # Application configuration
+      - DECIDIM_APPLICATION_NAME=${DECIDIM_APPLICATION_NAME:-My Decidim Instance}
+      - DECIDIM_MAILER_SENDER=${DECIDIM_MAILER_SENDER:?}
+
+      # Optional but recommended
+      - DECIDIM_DEFAULT_LOCALE=${DECIDIM_DEFAULT_LOCALE:-en}
+      - DECIDIM_AVAILABLE_LOCALES=${DECIDIM_AVAILABLE_LOCALES:-en,es,ca}
+
+      # Redis configuration (if using Sidekiq for background jobs)
+      - REDIS_URL=redis://redis:6379/0
   pg:
     image: postgres:latest
     volumes:
