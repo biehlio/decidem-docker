@@ -7,9 +7,8 @@ services:
       sh -c "bundle exec rake db:prepare && 
              bundle exec rake db:seed && 
              bundle exec rails s -b 0.0.0.0"
-    # Port mapping removed for Coolify domain-based routing
-    # Coolify will handle routing via Traefik proxy
-    # If you need direct port access, use: ports: ["127.0.0.1:3000:3000"]
+    ports:
+      - "3000:3000"
     environment:
       - RAILS_ENV=${RAILS_ENV:-production}
       - DATABASE_HOST=pg
